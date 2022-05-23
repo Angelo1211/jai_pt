@@ -1,30 +1,37 @@
 #import "Basic";
-#import "Window_Creation";
-#import "Input";
+#import "stb_image_write";
+
+WIDTH  :: 1920; 
+HEIGHT :: 1080;
+
+Pixel :: struct {
+	r : u8;
+	g : u8;
+	b : u8;
+	a : u8;
+};
 
 main :: ()
 {
-	window_width  :: 1280; 
-	window_height :: 720;
-	running := true;
+	pixels : [] Pixel;
+	pixels = NewArray(WIDTH * HEIGHT, Pixel);
+	defer free(pixels.data);
 
-	window := create_window(window_name="Path Tracer", width=window_width, height=window_height);
-
-	// TODO(AO) Look into SIMP
-
-	while running
+	for x : 0..WIDTH-1
 	{
-		update_window_events();
-
-		for event : events_this_frame
+		for y : 0..HEIGHT-1
 		{
-			if (event.type == .QUIT) || (event.key_code == .ESCAPE && event.key_pressed)
-			{
-				running = false;
-				break;
-			}
+			pixels[x + y * WIDTH].r = 128;
+
+			if x % 20 < 5
+				pixels[x + y * WIDTH].g = 230;
+
+			if y % 11 > 9
+				pixels[x + y * WIDTH].b = 200;
+
+			pixels[x + y * WIDTH].a = 255;
 		}
 	}
+
+	stbi_write_png("Image.png", WIDTH, HEIGHT, 4, pixels.data, 4);
 }
-
-
